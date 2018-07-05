@@ -9,8 +9,8 @@ Author: StrongXGP <xgp1227@gmail.com>
 Date:   2018/07/05
 """
 
+import tensorflow as tf
+
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-
-import tensorflow as tf
 
