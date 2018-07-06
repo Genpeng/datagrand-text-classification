@@ -11,8 +11,6 @@ from tensorflow.contrib import learn
 import data_helper
 from text_cnn import TextCNN
 
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-
 # Parameters
 # =========================================================================
 
@@ -186,6 +184,7 @@ def train(x_train, y_train, vocab_processor, x_dev, y_dev):
 def main(argv=None):
     x_train, y_train, vocab_processor, x_dev, y_dev = preprocess()
     train(x_train, y_train, vocab_processor, x_dev, y_dev)
+    print("Training finish(￣▽￣)／")
 
 
 if __name__ == '__main__':

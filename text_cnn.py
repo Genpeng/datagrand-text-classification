@@ -5,15 +5,13 @@ A convolutional neural network (CNN) for long text classification.
 
 Reference:
 - Kim, Yoon. "Convolutional neural networks for sentence classification." arXiv preprint arXiv:1408.5882 (2014).
+- http://www.wildml.com/2015/12/implementing-a-cnn-for-text-classification-in-tensorflow/
 
 Author: StrongXGP <xgp1227@gmail.com>
 Date:   2018/07/05
 """
 
 import tensorflow as tf
-
-import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 
 class TextCNN:
