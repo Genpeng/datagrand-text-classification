@@ -35,9 +35,7 @@ class TextCNN:
 
         # Embedding layer
         with tf.device('/cpu:0'), tf.name_scope("embedding"):
-            self.W = tf.get_variable(name="W",
-                                     shape=[vocab_size, embedding_size],
-                                     initializer=tf.random_uniform_initializer(-1.0, 1.0))
+            self.W = tf.Variable(tf.random_uniform([vocab_size, embedding_size], -1.0, 1.0), name="W")
             self.embedded_chars = tf.nn.embedding_lookup(self.W, self.input_x)
             self.embedded_chars_expanded = tf.expand_dims(self.embedded_chars, axis=-1)
 
@@ -47,12 +45,8 @@ class TextCNN:
             with tf.name_scope("conv-maxpool-%s" % filter_size):
                 # Convolution layer
                 filter_shape = [filter_size, embedding_size, 1, num_filters]
-                W = tf.get_variable(name="W",
-                                    shape=filter_shape,
-                                    initializer=tf.truncated_normal_initializer(stddev=0.1))
-                b = tf.get_variable(name="b",
-                                    shape=[num_filters],
-                                    initializer=tf.constant_initializer(0.1))
+                W = tf.Variable(tf.truncated_normal(filter_shape, stddev=0.1), name="W")
+                b = tf.Variable(tf.constant(0.1, shape=[num_filters]), name="b")
                 conv = tf.nn.conv2d(input=self.embedded_chars_expanded,
                                     filter=W,
                                     strides=[1, 1, 1, 1],
@@ -81,7 +75,7 @@ class TextCNN:
         with tf.name_scope("output"):
             W = tf.get_variable(name="W",
                                 shape=[num_filters_total, num_classes],
-                                initializer=tf.truncated_normal_initializer(stddev=0.1))
+                                initializer=tf.contrib.layers.xavier_initializer())
             b = tf.get_variable(name="b",
                                 shape=[num_classes],
                                 initializer=tf.constant_initializer(0.1))

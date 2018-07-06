@@ -20,6 +20,11 @@ Thumbs.db
 *.gch
 *.out
 
+#######################
+# Python Ignore files #
+#######################
+__pycache__/
+
 ##########################
 # Jetbrains Ignore files #
 ##########################
@@ -27,6 +32,12 @@ Thumbs.db
 .idea/
 
 ########################
+# PyCharm Ignore files #
+########################
+
+
+########################
 # Project Ignore files #
 ########################
 raw_data/
+runs/
