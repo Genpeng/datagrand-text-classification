@@ -9,7 +9,7 @@ from tensorflow.contrib import learn
 
 # Self-defined modules or classes
 import data_helper
-from text_cnn import TextCNN
+from text_cnn_nonstatic import TextCNN
 
 # Parameters
 # =========================================================================
@@ -135,7 +135,7 @@ def train(x_train, y_train, vocab_processor, x_dev, y_dev):
             # Write vocabulary
             vocab_processor.save(os.path.join(out_dir, "vocab"))
 
-            # Initialize al variables
+            # Initialize all variables
             sess.run(tf.global_variables_initializer())
 
             def train_step(x_batch, y_batch):
@@ -182,9 +182,11 @@ def train(x_train, y_train, vocab_processor, x_dev, y_dev):
 
 
 def main(argv=None):
+    start_time = time.time()
     x_train, y_train, vocab_processor, x_dev, y_dev = preprocess()
     train(x_train, y_train, vocab_processor, x_dev, y_dev)
     print("Training finish(￣▽￣)／")
+    print("Total time: {} seconds.".format(time.time() - start_time))
 
 
 if __name__ == '__main__':
