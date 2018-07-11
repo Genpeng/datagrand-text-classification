@@ -41,4 +41,5 @@ __pycache__/
 ########################
 raw_data/
 runs/
+ipython/
 .ipynb_checkpoints/
