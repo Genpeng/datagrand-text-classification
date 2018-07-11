@@ -16,7 +16,7 @@ from text_cnn_nonstatic import TextCNN
 
 # Data loading params
 tf.flags.DEFINE_float("dev_sample_percentage", 0.1, "Percentage of the training data to use for validation")
-tf.flags.DEFINE_string("data_file", "../../raw_data/demo.csv", "Data source")
+tf.flags.DEFINE_string("data_file", "../../raw_data/train_set.csv", "Data source")
 
 # Model hyperparameter
 tf.flags.DEFINE_integer("embedding_dim", 256, "Dimensionality of character embedding (default: 256)")
