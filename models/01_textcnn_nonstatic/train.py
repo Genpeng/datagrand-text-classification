@@ -41,7 +41,7 @@ FLAGS = tf.flags.FLAGS
 
 
 def preprocess():
-    # Data Preparation
+    # Data preparation
     #======================================================================
 
     # Load data
