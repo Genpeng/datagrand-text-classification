@@ -15,7 +15,7 @@ from gensim.models.word2vec import Word2Vec
 
 print("Loading data...")
 
-data_file = "../raw_data/train_set.csv"
+data_file = "../raw_data/demo.csv"
 lines = open(data_file, 'r', encoding='utf-8').read().splitlines()[1:]
 char_samples = [line.split(',')[1] for line in lines]
 char_samples = [char_sample.split() for char_sample in char_samples]
