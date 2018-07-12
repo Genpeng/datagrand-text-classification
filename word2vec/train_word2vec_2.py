@@ -28,7 +28,7 @@ gc.collect()
 
 print("Start training...")
 
-model = Word2Vec(char_samples, size=300)
+model = Word2Vec(char_samples, size=300, min_count=1)
 model.wv.save("datagrand-char-300d.bin")
 model.wv.save_word2vec_format("datagrand-char-300d.txt", binary=False)
 
