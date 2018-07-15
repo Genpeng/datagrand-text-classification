@@ -1,7 +1,7 @@
 # _*_ coding: utf-8 _*_
 
 """
-Description ...
+Long text classification by using LightGBM model.
 
 Author: StrongXGP
 Date:	2018/07/13
@@ -171,7 +171,6 @@ def main():
     # Make submission
     # ============================================================================
 
-    # Make submission
     df_test = pd.read_csv(test_data_file)
     submission = pd.DataFrame()
     submission['id'] = df_test['id']
