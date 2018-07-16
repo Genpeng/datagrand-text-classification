@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 import lightgbm as lgb
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import f1_score
+from sklearn.metrics import f1_score, accuracy_score
 
 # Global variables
 PAD_STR = '<PAD>'
@@ -87,8 +87,8 @@ def main():
     # ============================================================================
 
     print("Load data...")
-    train_data_file = "../../raw_data/train_demo.csv"
-    test_data_file = "../../raw_data/test_demo.csv"
+    train_data_file = "../../raw_data/train_set.csv"
+    test_data_file = "../../raw_data/test_set.csv"
     char_samples_train, labels_train = load_char_samples_and_labels(train_data_file, has_header=True, is_train=True)
     char_samples_test, _ = load_char_samples_and_labels(test_data_file, has_header=True, is_train=False)
 
@@ -100,7 +100,7 @@ def main():
     # ============================================================================
 
     print("Generate the mapping from characters to its corresponding vectors...")
-    char_vectors_path = "../../word_vectors/demo/demo-300d.txt"
+    char_vectors_path = "../../word_vectors/all/datagrand-char-300d.txt"
     char_to_vec_map = generate_char_mapping(char_vectors_path)
 
     # Extract features and split data into training, validation and testing set
@@ -136,16 +136,21 @@ def main():
     lgb_train = lgb.Dataset(X_train.values, y_train.values)
     lgb_val = lgb.Dataset(X_val.values, y_val.values, reference=lgb_train)
 
+    num_classes = max(labels_train)
     params = {
         'boosting_type': 'gbdt',
         'objective': 'multiclass',
-        'num_class': max(labels_train),
+        'num_class': num_classes,
         'metric': 'multi_logloss',
-        'num_leaves': 31,
-        'max_depth': 7,
-        'learning_rate': 0.05
+        'num_leaves': 15,
+        'max_depth': 4,
+        'learning_rate': 0.05,
+        'feature_fraction': 0.8,
+        # 'bagging_fraction': 0.8,
+        # 'bagging_freq': 5,
+        'verbose': 0
     }
-    num_boost_round = 500
+    num_boost_round = 2000
     feature_names = ['embed_' + str(col) for col in range(EMBEDDING_SIZE)]
 
     print("Start training...")
@@ -159,25 +164,20 @@ def main():
     print("Training finished! ^_^")
     print("Total seconds: %ds" % (time.time() - start_time))
 
-    # Calculate the f1 score of validation set
+    # Calculate the f1 score and accuracy of training and validation set
+    probs_train = gbm.predict(X_train, num_iteration=gbm.best_iteration)
+    preds_train = np.argmax(probs_train, axis=1)
+    score_train = f1_score(y_train, preds_train, average='weighted')
+    acc_train = accuracy_score(y_train, preds_train)
+    print("The f1 score of training set after %d epochs is: %f" % (gbm.best_iteration, score_train))
+    print("The accuracy of training set after %d epochs is: %f" % (gbm.best_iteration, acc_train))
+
     probs_val = gbm.predict(X_val, num_iteration=gbm.best_iteration)
     preds_val = np.argmax(probs_val, axis=1)
     score_val = f1_score(y_val, preds_val, average='weighted')
+    acc_val = accuracy_score(y_val, preds_val)
     print("The f1 score of validation set after %d epochs is: %f" % (gbm.best_iteration, score_val))
-
-    print("Save model...")
-    gbm.save_model("2018-07-15_lgb_300d.txt")
-
-    # Make submission
-    # ============================================================================
-
-    df_test = pd.read_csv(test_data_file)
-    submission = pd.DataFrame()
-    submission['id'] = df_test['id']
-    probs_test = gbm.predict(X_test, num_iteration=gbm.best_iteration)
-    preds_test = np.argmax(probs_test, axis=1) + 1
-    submission['class'] = preds_test
-    submission.to_csv("../../submission/2018-07-15_lgb_submission.csv", index=False)
+    print("The accuracy of validation set after %d epochs is: %f" % (gbm.best_iteration, acc_val))
 
 
 if __name__ == '__main__':

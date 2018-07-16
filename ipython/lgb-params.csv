@@ -1,0 +1,2 @@
+time,model,n_feat,type,lr,n_leaf,n_depth,min_data,feat_frac,bagging_frac,bagging_freq,l1,l2,min_gain,hessian,train_size
+2018-7-16 14:00,LightGBM_baseline_new,300,gbdt,0.1,31,6,512,0.6,0.9,1,6.37,65200,0,0.1,0.8
