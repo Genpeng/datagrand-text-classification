@@ -1,2 +1,0 @@
-time,model,n_feat,type,lr,n_leaf,n_depth,min_data,feat_frac,bagging_frac,bagging_freq,l1,l2,min_gain,hessian,train_size,best_round,loss_train,loss_val,acc_train,acc_val,f1_train,f1_val
-2018-7-16 16:59,LightGBM_baseline_new,300,gbdt,0.1,31,6,512,0.6,0.9,1,6.37E+00,6.52E+04,0.00E+00,1.00E-01,8.00E-01,100,2.92805,2.92916,0.37,0.35,0.29,0.27654

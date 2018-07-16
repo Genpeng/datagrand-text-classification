@@ -1,10 +1,10 @@
 # _*_ coding: utf-8 _*_
 
 """
-Long text classification by using LightGBM model.
+Tune the hyper-parameters of LightGBM model.
 
 Author: StrongXGP
-Date:	2018/07/13
+Date:	2018/07/16
 """
 
 import gc
@@ -71,31 +71,33 @@ for i in range(num_params):
     print("Hyper-parameters:")
     print(params)
 
+    print("Start training...")
     evals_result = {}
     gbm = lgb.train(params=params,
                     train_set=lgb_train,
-                    num_boost_round=100,
+                    num_boost_round=5000,
                     valid_sets=[lgb_train, lgb_val],
                     valid_names=['train', 'val'],
                     evals_result=evals_result,
                     early_stopping_rounds=50,
-                    verbose_eval=1)
+                    verbose_eval=100)
+    print("Training finished! ^_^")
 
-    best_round = gbm.best_iteration - 1
-    loss_train = evals_result['train']['multi_logloss'][best_round]
-    loss_val = evals_result['val']['multi_logloss'][best_round]
+    best_iter = gbm.best_iteration
+    loss_train = evals_result['train']['multi_logloss'][best_iter-1]
+    loss_val = evals_result['val']['multi_logloss'][best_iter-1]
 
-    probs_train = gbm.predict(X_train, num_iteration=best_round)
+    probs_train = gbm.predict(X_train, num_iteration=best_iter)
     preds_train = np.argmax(probs_train, axis=1)
     acc_train = accuracy_score(y_train, preds_train)
     f1_train = f1_score(y_train, preds_train, average='weighted')
 
-    probs_val = gbm.predict(X_val, num_iteration=best_round)
+    probs_val = gbm.predict(X_val, num_iteration=best_iter)
     preds_val = np.argmax(probs_val, axis=1)
     acc_val = accuracy_score(y_val, preds_val)
     f1_val = f1_score(y_val, preds_val, average='weighted')
 
-    print("Best round: %d" % best_round)
+    print("Best iteration: %d" % best_iter)
     print("Training Loss: %.5f, Validation Loss: %.5f" % (loss_train, loss_val))
     print("Training Accuracy: %.2f, Validation Accuracy: %.2f" % (acc_train * 100, acc_val * 100))
     print("Training F1 Score: %.5f, Validation F1 Score: %.5f" % (f1_train, f1_val))
@@ -103,7 +105,7 @@ for i in range(num_params):
     res = "%s,%s,%d,%s,%.4f,%d,%d,%d,%.4f,%.4f,%d,%.4e,%.4e,%.4e,%.4e,%.4e,%d,%.5f,%.5f,%.2f,%.2f,%.5f,%.5f\n" % (
         datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
         "lgb-300d-sum",  # model name
-        num_feats,
+        num_feats,  # number of features
         params['boosting_type'],
         params['learning_rate'],
         params['num_leaves'],
@@ -117,13 +119,13 @@ for i in range(num_params):
         params['min_gain_to_split'],
         params['min_sum_hessian_in_leaf'],
         0.8,  # train size
-        best_round,
-        loss_train,
-        loss_val,
-        acc_train,
-        acc_val,
-        f1_train,
-        f1_val
+        best_iter,  # best iteration
+        loss_train,  # multi-logloss of training set
+        loss_val,  # multi-logloss of validation set
+        acc_train,  # accuracy of training set
+        acc_val,  # accuracy of validation set
+        f1_train,  # f1 score of training set
+        f1_val  # f1 score of validation set
     )
 
     f = open("lgb-tuning-results.csv", 'a')
