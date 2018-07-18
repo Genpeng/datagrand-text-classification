@@ -50,7 +50,7 @@ if __name__ == '__main__':
 
     # Calculate the size of vocabulary
     # =========================================================================
-    
+
     chars = []
     for sentence in sentences:
         chars.extend(sentence)

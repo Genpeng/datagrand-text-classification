@@ -8,7 +8,6 @@ Date:	2018/07/16
 """
 
 import gc
-import datetime
 import numpy as np
 import pandas as pd
 import lightgbm as lgb
@@ -18,8 +17,8 @@ from sklearn.metrics import f1_score, accuracy_score
 # ============================================================================
 
 print("Load data...")
-train_data_file = "../../processed_data/train-data-300d-sum.txt"
-test_data_file = "../../processed_data/test-data-300d-sum.txt"
+train_data_file = "../../processed_data/train-data-word-300d-mean.txt"
+test_data_file = "../../processed_data/test-data-word-300d-mean.txt"
 df_train = pd.read_csv(train_data_file)
 df_test = pd.read_csv(test_data_file)
 
@@ -37,7 +36,7 @@ gc.collect()
 
 lgb_train = lgb.Dataset(X_train.values, y_train.values)
 
-df_params = pd.read_csv("lgb-char-300d-tuning-results.csv").sort_values(by='f1_val', ascending=False)
+df_params = pd.read_csv("lgb-word-300d-mean-tuning-results.csv").sort_values(by='f1_val', ascending=False)
 for i in range(1):
     params = {
         'boosting_type': df_params['type'].values[i],
@@ -97,7 +96,7 @@ for i in range(1):
 
     feature_importance = pd.DataFrame({'name': gbm.feature_name(), 'importance': gbm.feature_importance()})
     feature_importance.sort_values(by='importance', ascending=False, inplace=True)
-    feature_importance.to_csv("feature-importance-char-300d.csv", index=False)
+    feature_importance.to_csv("feature-importance-char-300d-mean.csv", index=False)
 
     # Make submission
     probs_test = gbm.predict(X_test)
@@ -106,4 +105,4 @@ for i in range(1):
     submission = pd.DataFrame()
     submission['id'] = df_test['id']
     submission['class'] = preds_test
-    submission.to_csv("2018-07-16_lgb-char-300d-sum-submission.csv", index=False)
+    submission.to_csv("2018-07-17_lgb-word-300d-mean-submission.csv", index=False)

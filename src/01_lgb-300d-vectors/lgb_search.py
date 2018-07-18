@@ -19,7 +19,7 @@ from sklearn.metrics import f1_score, accuracy_score
 # ============================================================================
 
 print("Load data...")
-data_path = "../../processed_data/train-data-300d-sum.txt"
+data_path = "../../processed_data/train-data-word-300d-mean.txt"
 data = pd.read_csv(data_path)
 
 X = data.drop(['class'], axis=1)
@@ -39,7 +39,7 @@ gc.collect()
 lgb_train = lgb.Dataset(X_train.values, y_train.values)
 lgb_val = lgb.Dataset(X_val.values, y_val.values, reference=lgb_train)
 
-df_params = pd.read_csv("lgb-params.csv")
+df_params = pd.read_csv("lgb-word-300d-mean-params.csv")
 num_params = df_params.shape[0]
 for i in range(num_params):
     params = {
@@ -128,6 +128,6 @@ for i in range(num_params):
         f1_val  # f1 score of validation set
     )
 
-    f = open("lgb-tuning-results.csv", 'a')
+    f = open("lgb-word-300d-mean-tuning-results.csv", 'a')
     f.write(res)
     f.close()

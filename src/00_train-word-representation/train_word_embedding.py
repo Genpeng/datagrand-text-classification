@@ -61,7 +61,7 @@ if __name__ == '__main__':
 
     print("Start training...")
 
-    model = Word2Vec(size=300, min_count=1)
+    model = Word2Vec(size=300, min_count=5)
     model.build_vocab(sentences)
     print(model)
 

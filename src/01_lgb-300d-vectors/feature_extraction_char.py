@@ -12,7 +12,7 @@ import pandas as pd
 
 # Global variables
 PAD_STR = '<pad>'
-SEQUENCE_LENGTH = 3000
+SEQUENCE_LENGTH = 3000  # documents with the number of characters less than 3000 is 94.1375%
 EMBEDDING_SIZE = 300
 
 
