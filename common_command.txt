@@ -1,0 +1,9 @@
+nohup python -u feature_extraction.py > feature_extraction.log 2>&1 &
+nohup python -u lgb_search.py > lgb_search.log 2>&1 &
+nohup python -u lgb_train.py > lgb_train.log 2>&1 &
+nohup python -u train_word_embedding.py > train_word_embedding.log 2>&1 &
+nohup python -u feature_extraction_word.py > feature_extraction_word.log 2>&1 &
+nohup python -u baseline.py > baseline.log 2>&1 &
+
+# 7z压缩命令
+7z a -t7z -r datagrand-word-300d-mc5.7z datagrand-word-300d-mc5.txt
