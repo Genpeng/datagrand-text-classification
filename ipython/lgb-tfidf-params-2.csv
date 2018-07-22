@@ -1,0 +1,2 @@
+id,ngram_range,max_df,min_df,max_features,sublinear,type,lr,n_leaf,n_depth,min_data,feat_frac,bagging_frac,bagging_freq,l1,l2,min_gain,hessian
+1,1|2,0.9,3,20000,True,gbdt,0.05,30,10,300,0.6,0.8,1,0,100,0,0.1

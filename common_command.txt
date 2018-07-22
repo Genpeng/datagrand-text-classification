@@ -4,6 +4,14 @@ nohup python -u lgb_train.py > lgb_train.log 2>&1 &
 nohup python -u train_word_embedding.py > train_word_embedding.log 2>&1 &
 nohup python -u feature_extraction_word.py > feature_extraction_word.log 2>&1 &
 nohup python -u baseline.py > baseline.log 2>&1 &
+nohup python -u svm_search.py > svm_search.log 2>&1 &
+nohup python -u lgb_search.py > lgb_search.log 2>&1 &
+nohup python -u svm_tfidf_search.py > svm_tfidf_search.log 2>&1 &
+nohup python -u svm_tfidf_embedding_test.py > svm_tfidf_embedding_test.log 2>&1 &
+nohup python -u lgb_tfidf_embedding_test.py > lgb_tfidf_embedding_test.log 2>&1 &
+
+tail -f svm_tfidf_embedding_test.log
+tail -f lgb_tfidf_embedding_test.log
 
 # 7z压缩命令
 7z a -t7z -r datagrand-word-300d-mc5.7z datagrand-word-300d-mc5.txt
