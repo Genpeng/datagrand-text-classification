@@ -52,7 +52,7 @@ vect_params = {
     'ngram_range': (1, 2),
     'min_df': 5,
     'max_df': 0.9,
-    'max_features': 200000,
+    'max_features': 50000,
     'sublinear_tf': True
 }
 vectorizer = TfidfVectorizer(**vect_params)
