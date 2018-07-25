@@ -8,6 +8,7 @@ Date:	2018/07/13
 """
 
 import gc
+from time import time
 from gensim.models.word2vec import Word2Vec
 
 
@@ -40,10 +41,10 @@ if __name__ == '__main__':
     # =========================================================================
 
     print("Loading data...")
-
-    train_data_file = "../../raw_data/train_set.csv"
-    test_data_file = "../../raw_data/test_set.csv"
+    train_data_file = "../../raw_data/train_demo.csv"
+    test_data_file = "../../raw_data/test_demo.csv"
     sentences = load_word_samples(train_data_file, test_data_file)
+    print("The total number of samples is: %d" % len(sentences))
 
     # Calculate the size of vocabulary
     # =========================================================================
@@ -59,17 +60,18 @@ if __name__ == '__main__':
     # Train and save word2vec model
     # =========================================================================
 
-    print("Start training...")
-
-    model = Word2Vec(size=300, min_count=5)
+    # Initialize word2vec model
+    model = Word2Vec(size=300, min_count=1, sg=0, iter=30, workers=16, seed=42)
     model.build_vocab(sentences)
     print(model)
 
-    batches = batch_iter(sentences, batch_size=20000)
+    print("Start training...")
+    t0 = time()
+    batches = batch_iter(sentences, batch_size=50000)
     for batch in batches:
-        model.train(batch, total_examples=model.corpus_count, epochs=model.epochs)
-
+        model.train(batch, total_examples=len(batch), epochs=model.epochs)
+    print("Done in %.3f seconds!" % (time() - t0))
     print("Training Finish! ^_^")
 
-    model.wv.save("datagrand-word-300d.bin")
-    model.wv.save_word2vec_format("datagrand-word-300d.txt", binary=False)
+    model.wv.save("../../word_vectors/gensim-word-300d.bin")
+    model.wv.save_word2vec_format("../../word_vectors/gensim-word-300d.txt", binary=False)

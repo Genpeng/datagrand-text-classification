@@ -8,6 +8,7 @@ Date:	2018/07/13
 """
 
 import gc
+from time import time
 from gensim.models.word2vec import Word2Vec
 
 
@@ -43,10 +44,10 @@ if __name__ == '__main__':
     # =========================================================================
 
     print("Loading data...")
-
     train_data_file = "../raw_data/train_set.csv"
     test_data_file = "../raw_data/test_set.csv"
     sentences = load_char_samples(train_data_file, test_data_file)
+    print("The total number of samples is: %d" % len(sentences))
 
     # Calculate the size of vocabulary
     # =========================================================================
@@ -68,9 +69,11 @@ if __name__ == '__main__':
     model.build_vocab(sentences)
     print(model)
 
+    t0 = time()
     batches = batch_iter(sentences, batch_size=20000)
     for batch in batches:
         model.train(batch, total_examples=model.corpus_count, epochs=model.epochs)
+    print("Done in %.3f seconds" % (time() - t0))
 
     print("Training Finish! ^_^")
 

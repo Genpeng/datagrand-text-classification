@@ -1,11 +1,11 @@
 # _*_ coding: utf-8 _*_
 
 """
-Test the fusion features (TF-IDF features + embedding features)
+Test the fusion features (TF-IDF features + embedding features + topic model features)
 where the prediction model is LightGBM.
 
 Author: StrongXGP
-Date:	2018/07/21
+Date:	2018/07/24
 """
 
 import gc
@@ -18,13 +18,14 @@ from pprint import pprint
 from scipy.sparse import csr_matrix, hstack
 from sklearn.metrics import f1_score, accuracy_score
 from sklearn.model_selection import train_test_split
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.decomposition import LatentDirichletAllocation
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 
-# ============================================================================
 # Load data
+# ============================================================================
 
 print("Load data...")
-data_path = "../../raw_data/train_set.csv"
+data_path = "../../raw_data/train_demo.csv"
 data = pd.read_csv(data_path)
 
 X_text = data['word_seg']
@@ -36,8 +37,8 @@ print("The number of classes is: %d" % num_classes)
 del data
 gc.collect()
 
-# ============================================================================
 # Load character/word embedding
+# ============================================================================
 
 print("Load character and word embedding...")
 char_embed_file = "../../processed_data/train-data-char-300d-mean.txt"
@@ -45,40 +46,72 @@ char_embed = pd.read_csv(char_embed_file).drop(['class'], axis=1)
 word_embed_file = "../../processed_data/train-data-word-300d-mean.txt"
 word_embed = pd.read_csv(word_embed_file).drop(['class'], axis=1)
 
+# Extract TF features
 # ============================================================================
-# Extract TF-IDF features
 
-vect_params = {
+tf_vect_params = {
     'ngram_range': (1, 2),
-    'min_df': 5,
+    'min_df': 3,
     'max_df': 0.9,
-    'max_features': 200000,
-    'sublinear_tf': True
+    'max_features': 20000,
 }
-vectorizer = TfidfVectorizer(**vect_params)
-print("Vectorizer's hyper-parameters:")
-pprint(vect_params)
+tf_vectorizer = CountVectorizer(**tf_vect_params)
+print("CountVectorizer's hyper-parameters:")
+pprint(tf_vect_params)
 
-print("Extract features...")
+print("Extract term frequency (TF) features...")
 t0_extract = time()
-X = vectorizer.fit_transform(X_text)
+X_tf = tf_vectorizer.fit_transform(X_text)
 print("Done in %.3f seconds" % (time() - t0_extract))
 print("Extract finished! ( ^ _ ^ ) V")
 
 del X_text
 gc.collect()
 
+# Transform TF features to IDF features
 # ============================================================================
-# Concatenate TF-IDF features and embedding features
 
-print("Concatenate TF-IDF features and embedding features...")
-X = hstack([X, csr_matrix(char_embed), csr_matrix(word_embed)], format='csr')
+tfidf_transformer = TfidfTransformer(sublinear_tf=True)
 
-del char_embed, word_embed
+print("Transform to inverse document frequency (IDF) features...")
+t0_transform = time()
+X_tfidf = tfidf_transformer.fit_transform(X_tf)
+print("Done in %.3f seconds" % (time() - t0_transform))
+print("Transform finished! ( ^ _ ^ ) V")
+
+# Extract topic model features
+# ============================================================================
+
+lda_params = {
+    'n_components': num_classes,
+    'learning_method': 'online',
+    'n_jobs': -1,
+    'random_state': 10
+}
+lda = LatentDirichletAllocation(**lda_params)
+print("LDA vectorizer's hyper-parameters:")
+pprint(lda_params)
+
+print("Extract topic model features...")
+t0_lda = time()
+X_lda = lda.fit_transform(X_tf)
+print("Done in %.3f seconds" % (time() - t0_lda))
+print("Extract finished! ( ^ _ ^ ) V")
+
+del X_tf
 gc.collect()
 
+# Concatenate TF-IDF features, embedding features and topic model features
 # ============================================================================
+
+print("Concatenate all the features...")
+X = hstack([X_tfidf, csr_matrix(char_embed), csr_matrix(word_embed), csr_matrix(X_lda)], format='csr')
+
+del X_tfidf, char_embed, word_embed, X_lda
+gc.collect()
+
 # Tuning the hyper-parameters of LightGBM model and save the results
+# ============================================================================
 
 print("Split data into training and validation set...")
 X_train, X_val, y_train, y_val = train_test_split(X, y, train_size=0.8, test_size=0.2, random_state=42)
@@ -86,7 +119,7 @@ X_train, X_val, y_train, y_val = train_test_split(X, y, train_size=0.8, test_siz
 lgb_train = lgb.Dataset(X_train, y_train)
 lgb_val = lgb.Dataset(X_val, y_val, reference=lgb_train)
 
-df_params = pd.read_csv("lgb-tfidf-embedding-params.csv")
+df_params = pd.read_csv("lgb-tfidf-embedding-lda-params.csv")
 num_params = df_params.shape[0]
 print()
 print("The number of parameter combinations is: %d" % num_params)
@@ -159,7 +192,7 @@ for i in range(num_params):
     res = "%s,%s,%d,%s,%.4f,%d,%d,%d,%.4f,%.4f,%d,%.4e,%.4e,%.4e,%.4e,%.4e,%d,%.5f,%.5f,%.2f,%.2f,%.5f,%.5f\n" % (
         datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
         "lgb-tfidf-embedding-%d" % (i + 1),  # model name
-        vect_params['max_features'] + 600,  # number of features
+        tf_vect_params['max_features'] + 600 + num_classes,  # number of features
         gbm_params['boosting_type'],
         gbm_params['learning_rate'],
         gbm_params['num_leaves'],
@@ -182,6 +215,6 @@ for i in range(num_params):
         f1_val  # f1 score of validation set
     )
 
-    f = open("lgb-tfidf-embedding-tuning-results.csv", 'a')
+    f = open("lgb-tfidf-embedding-lda-tuning-results.csv", 'a')
     f.write(res)
     f.close()
