@@ -9,9 +9,23 @@ nohup python -u lgb_search.py > lgb_search.log 2>&1 &
 nohup python -u svm_tfidf_search.py > svm_tfidf_search.log 2>&1 &
 nohup python -u svm_tfidf_embedding_test.py > svm_tfidf_embedding_test.log 2>&1 &
 nohup python -u lgb_tfidf_embedding_test.py > lgb_tfidf_embedding_test.log 2>&1 &
+nohup python -u lgb_tfidf_embedding_lda_test.py > lgb_tfidf_embedding_lda_test.log 2>&1 &
+nohup python -u train_char_embedding.py > train_char_embedding.log 2>&1 &
 
 tail -f svm_tfidf_embedding_test.log
-tail -f lgb_tfidf_embedding_test.log
+tail -f lgb_tfidf_embedding_lda_test.log
+tail -f train_word_embedding.log
+tail -f train_char_embedding.log
+tail -f feature_extraction_word.log
 
 # 7z压缩命令
 7z a -t7z -r datagrand-word-300d-mc5.7z datagrand-word-300d-mc5.txt
+
+# sent2vec
+./fasttext sent2vec -input train_demo_word_samples.txt -output sen2vec_model.bin -minCount 3 -dim 300 -epoch 30 -lr 0.2 -wordNgrams 2 -loss ns -neg 10 -thread 20 -t 0.000005 -dropoutK 4 -minCountLabel 20 -bucket 4000000
+
+./fasttext sent2vec -input ../xgp/datagrand-text-classification/raw_data/train_demo_word_samples.txt -output sen2vec_demo_model.bin -lr 0.2 -dim 300 -epoch 2 -minCount 3 -wordNgrams 2 -loss ns -thread 20 
+
+nohup ./fasttext sent2vec -input ../xgp/datagrand-text-classification/raw_data/train_demo_word_samples.txt -output sen2vec_demo_model.bin -lr 0.2 -dim 300 -epoch 2 -minCount 3 -wordNgrams 2 -loss ns -thread 20 > sent2vec.log 2>&1 &
+
+nohup ./fasttext sent2vec -input ../xgp/datagrand-text-classification/raw_data/word_samples.txt -output sen2vec_model.bin -lr 0.2 -dim 300 -epoch 30 -minCount 3 -wordNgrams 2 -loss ns -thread 20 > sent2vec.log 2>&1 &

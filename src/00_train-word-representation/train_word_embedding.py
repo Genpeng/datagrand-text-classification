@@ -67,11 +67,11 @@ if __name__ == '__main__':
 
     print("Start training...")
     t0 = time()
-    batches = batch_iter(sentences, batch_size=20000)
+    batches = batch_iter(sentences, batch_size=50000)
     for batch in batches:
         model.train(batch, total_examples=len(batch), epochs=model.epochs)
     print("Done in %.3f seconds!" % (time() - t0))
-    print("Training Finish! ^_^")
+    print("Training Finish! ( ^ _ ^ ) V")
 
     model.wv.save("../../word_vectors/gensim-word-300d.bin")
     model.wv.save_word2vec_format("../../word_vectors/gensim-word-300d.txt", binary=False)
