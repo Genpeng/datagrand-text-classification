@@ -67,7 +67,7 @@ if __name__ == '__main__':
 
     print("Start training...")
     t0 = time()
-    batches = batch_iter(sentences, batch_size=50000)
+    batches = batch_iter(sentences, batch_size=20000)
     for batch in batches:
         model.train(batch, total_examples=len(batch), epochs=model.epochs)
     print("Done in %.3f seconds!" % (time() - t0))
