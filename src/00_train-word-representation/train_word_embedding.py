@@ -1,7 +1,7 @@
 # _*_ coding: utf-8 _*_
 
 """
-Train distributed representation of words using gensim.
+Train distributed representation of words by using gensim.
 
 Author: StrongXGP
 Date:	2018/07/13
@@ -41,8 +41,8 @@ if __name__ == '__main__':
     # =========================================================================
 
     print("Loading data...")
-    train_data_file = "../../raw_data/train_demo.csv"
-    test_data_file = "../../raw_data/test_demo.csv"
+    train_data_file = "../../raw_data/train_set.csv"
+    test_data_file = "../../raw_data/test_set.csv"
     sentences = load_word_samples(train_data_file, test_data_file)
     print("The total number of samples is: %d" % len(sentences))
 
