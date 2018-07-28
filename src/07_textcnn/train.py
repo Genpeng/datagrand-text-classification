@@ -9,14 +9,15 @@ from tensorflow.contrib import learn
 
 # Self-defined modules or classes
 import data_helper
-from text_cnn_nonstatic import TextCNN
+from text_cnn import TextCNN
 
 # Parameters
 # =========================================================================
 
 # Data loading params
 tf.flags.DEFINE_float("dev_sample_percentage", 0.1, "Percentage of the training data to use for validation")
-tf.flags.DEFINE_string("data_file", "../../raw_data/train_set.csv", "Data source")
+tf.flags.DEFINE_string("positive_data_file", "../../raw_data/rt-polaritydata/train_set.csv", "Data source for the positive data")
+tf.flags.DEFINE_string("negative_data_file", "../../raw_data/rt-polaritydata/train_set.csv", "Data source for the negative data")
 
 # Model hyperparameter
 tf.flags.DEFINE_integer("embedding_dim", 256, "Dimensionality of character embedding (default: 256)")

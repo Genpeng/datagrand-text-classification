@@ -1,7 +1,7 @@
 # _*_ coding: utf-8 _*_
 
 """
-Train distributed representation of words using gensim.
+Train distributed representation of words by using gensim.
 
 Author: StrongXGP
 Date:	2018/07/13
@@ -41,8 +41,8 @@ if __name__ == '__main__':
     # =========================================================================
 
     print("Loading data...")
-    train_data_file = "../../raw_data/train_demo.csv"
-    test_data_file = "../../raw_data/test_demo.csv"
+    train_data_file = "../../raw_data/train_set.csv"
+    test_data_file = "../../raw_data/test_set.csv"
     sentences = load_word_samples(train_data_file, test_data_file)
     print("The total number of samples is: %d" % len(sentences))
 
@@ -71,7 +71,7 @@ if __name__ == '__main__':
     for batch in batches:
         model.train(batch, total_examples=len(batch), epochs=model.epochs)
     print("Done in %.3f seconds!" % (time() - t0))
-    print("Training Finish! ^_^")
+    print("Training Finish! ( ^ _ ^ ) V")
 
     model.wv.save("../../word_vectors/gensim-word-300d.bin")
     model.wv.save_word2vec_format("../../word_vectors/gensim-word-300d.txt", binary=False)
