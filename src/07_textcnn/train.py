@@ -1,5 +1,6 @@
 # _*_ coding: utf-8 _*_
 
+import gc
 import os
 import time
 import datetime
@@ -16,19 +17,18 @@ from text_cnn import TextCNN
 
 # Data loading params
 tf.flags.DEFINE_float("dev_sample_percentage", 0.1, "Percentage of the training data to use for validation")
-tf.flags.DEFINE_string("positive_data_file", "../../raw_data/rt-polaritydata/train_set.csv", "Data source for the positive data")
-tf.flags.DEFINE_string("negative_data_file", "../../raw_data/rt-polaritydata/train_set.csv", "Data source for the negative data")
+tf.flags.DEFINE_string("positive_data_file", "../../raw_data/rt-polaritydata/rt-polarity.pos", "Data source for the positive data")
+tf.flags.DEFINE_string("negative_data_file", "../../raw_data/rt-polaritydata/rt-polarity.neg", "Data source for the negative data")
 
 # Model hyperparameter
-tf.flags.DEFINE_integer("embedding_dim", 256, "Dimensionality of character embedding (default: 256)")
-tf.flags.DEFINE_string("filter_sizes", "2,3,4", "Comma-separated filter sizes (default: 2,3,4)")
-tf.flags.DEFINE_integer("num_filters", 256, "Number of filters per filter size (default: 256)")
+tf.flags.DEFINE_integer("embedding_dim", 128, "Dimensionality of character embedding (default: 128)")
+tf.flags.DEFINE_string("filter_sizes", "3,4,5", "Comma-separated filter sizes (default: 3,4,5)")
+tf.flags.DEFINE_integer("num_filters", 128, "Number of filters per filter size (default: 128)")
 tf.flags.DEFINE_float("dropout_keep_prob", 0.5, "Dropout keep probability (default: 0.5)")
 tf.flags.DEFINE_float("l2_reg_lambda", 0.0, "L2 regularization lambda (default: 0.0)")
 
 # Training parameters
-tf.flags.DEFINE_integer("sequence_length", 3072, "The length of sentence (default: 3072)")
-tf.flags.DEFINE_integer("batch_size", 128, "Batch size (default: 128)")
+tf.flags.DEFINE_integer("batch_size", 64, "Batch size (default: 64)")
 tf.flags.DEFINE_integer("num_epochs", 200, "Number of training epochs (default: 200)")
 tf.flags.DEFINE_integer("evaluate_every", 100, "Evaluate model on dev set after this many steps (default: 100)")
 tf.flags.DEFINE_integer("checkpoint_every", 100, "Save model after this many steps (default: 100)")
@@ -47,10 +47,10 @@ def preprocess():
 
     # Load data
     print("Loading data...")
-    x_text, y = data_helper.load_data_and_labels(FLAGS.data_file)
+    x_text, y = data_helper.load_data_and_labels(FLAGS.positive_data_file, FLAGS.negative_data_file)
 
     # Build vocabulary
-    max_document_length = FLAGS.sequence_length
+    max_document_length = max([len(x.split()) for x in x_text])
     vocab_processor = learn.preprocessing.VocabularyProcessor(max_document_length)
     x = np.array(list(vocab_processor.fit_transform(x_text)))
 
@@ -67,6 +67,7 @@ def preprocess():
     y_train, y_dev = y_shuffled[:dev_sample_index], y_shuffled[dev_sample_index:]
 
     del x_text, x, y, x_shuffled, y_shuffled
+    gc.collect()
 
     print("Vocabulary size: {:d}".format(len(vocab_processor.vocabulary_)))
     print("Train/Dev split: {:d}/{:d}".format(len(y_train), len(y_dev)))
@@ -140,9 +141,7 @@ def train(x_train, y_train, vocab_processor, x_dev, y_dev):
             sess.run(tf.global_variables_initializer())
 
             def train_step(x_batch, y_batch):
-                """
-                A single training step.
-                """
+                """A single training step."""
                 feed_dict = {cnn.input_x: x_batch,
                              cnn.input_y: y_batch,
                              cnn.dropout_keep_prob: FLAGS.dropout_keep_prob}
@@ -153,9 +152,7 @@ def train(x_train, y_train, vocab_processor, x_dev, y_dev):
                 train_summary_writer.add_summary(summaries, step)
 
             def dev_step(x_batch, y_batch, writer=None):
-                """
-                Evaluates model on a dev set.
-                """
+                """Evaluates model on a dev set."""
                 feed_dict = {cnn.input_x: x_batch,
                              cnn.input_y: y_batch,
                              cnn.dropout_keep_prob: 1.0}

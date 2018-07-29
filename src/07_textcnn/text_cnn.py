@@ -1,7 +1,8 @@
 # _*_ coding: utf-8 _*_
 
 """
-TensorFlow implementation of the paper "Convolutional neural networks for sentence classification".
+TensorFlow implementation of CNN model in the paper
+"Convolutional neural networks for sentence classification".
 
 Reference:
 - http://www.wildml.com/2015/12/implementing-a-cnn-for-text-classification-in-tensorflow/
@@ -48,7 +49,7 @@ class TextCNN:
                                     name="conv")
                 h = tf.nn.relu(tf.nn.bias_add(conv, b_filter), name="relu")  # apply non-linearity
 
-                # TODO Add batch normalization
+                # TODO: Add batch normalization
 
                 # Max-pooling over the outputs
                 pooled = tf.nn.max_pool(value=h,
