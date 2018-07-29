@@ -16,6 +16,7 @@ EMBEDDING_SIZE = 300
 SPECIAL_SYMBOL = ['<PAD>', '<UNK>']
 
 # Load words and its corresponding embeddings
+print("Load words and its corresponding embeddings...")
 word_embedding_file = "../../word_vectors/gemsim-word-300d-mc5.txt"
 with open(word_embedding_file, 'r', encoding='utf-8') as f:
     lines = f.read().splitlines()[1:]
@@ -33,6 +34,7 @@ word2id_series = pd.Series(range(len(words)), index=words)
 word_embeddings = np.vstack(word_embeddings)
 
 # Save to file
+print("Save to file...")
 id2word_file = "../../processed_data/id2word.pkl"
 word2id_file = "../../processed_data/word2id.pkl"
 word_embeddings_file = "../../word_vectors/word-embedding-300d-mc5.npy"
@@ -41,3 +43,4 @@ with open(id2word_file, 'wb') as fout:
 with open(word2id_file, 'wb') as fout:
     pickle.dump(word2id_series, fout)
 np.save(word_embeddings_file, word_embeddings)
+print("Finished! ( ^ _ ^ ) V")
