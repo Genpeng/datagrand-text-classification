@@ -206,4 +206,3 @@ def plan2():
 if __name__ == '__main__':
     plan1()
     plan2()
-

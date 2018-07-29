@@ -12,6 +12,8 @@ from tensorflow.contrib import learn
 import data_helper
 from text_cnn import TextCNN
 
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+
 # Parameters
 # =========================================================================
 
@@ -173,18 +175,24 @@ def train(x_train, y_train, vocab_processor, x_dev, y_dev):
                 if current_step % FLAGS.evaluate_every == 0:
                     print("\nEvaluation: ")
                     dev_step(x_dev, y_dev, writer=dev_summary_writer)
-                    print("")
+                    print()
                 if current_step % FLAGS.checkpoint_every == 0:
                     path = saver.save(sess, checkpoint_prefix, global_step=current_step)
                     print("Saved model checkpoint to {}\n".format(path))
 
 
 def main(argv=None):
-    start_time = time.time()
+    print("Generate training and validation data")
+    t0_preprocess = time.time()
     x_train, y_train, vocab_processor, x_dev, y_dev = preprocess()
+    print("Done in %.3f seconds!" % (time.time() - t0_preprocess))
+    print()
+
+    print("Start training...")
+    t0_train = time.time()
     train(x_train, y_train, vocab_processor, x_dev, y_dev)
-    print("Training finish(￣▽￣)／")
-    print("Total time: {} seconds.".format(time.time() - start_time))
+    print("Done in %.3f seconds!" % (time.time() - t0_train))
+    print("Training finished! ( ^ _ ^ ) V")
 
 
 if __name__ == '__main__':
