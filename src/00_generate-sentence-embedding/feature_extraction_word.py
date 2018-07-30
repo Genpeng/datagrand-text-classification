@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 
 # Global variables
-PAD_STR = '<pad>'
+PAD_STR = '<PAD>'
 SEQUENCE_LENGTH = 2000  # documents with the number of words less than 2000 is 95.3147%
 EMBEDDING_SIZE = 300
 
