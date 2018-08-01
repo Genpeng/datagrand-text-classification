@@ -34,7 +34,7 @@ def batch_iter(data, batch_size, num_epochs, shuffle=True):
     """Generate a batch iterator for a dataset."""
     data = np.array(data)
     data_size = len(data)
-    num_batches_per_epoch = int((len(data)-1)/batch_size) + 1
+    num_batches_per_epoch = ((len(data) - 1) // batch_size) + 1
     for epoch in range(num_epochs):
         # Shuffle the data at each epoch
         if shuffle:
@@ -61,7 +61,7 @@ def to_categorical(y, num_classes=None):
     -------
     categorical : A binary matrix representation of `y`
     """
-    y = np.array(y, dtype='int')
+    y = np.array(y, dtype=np.int32)
     input_shape = y.shape
     if input_shape and input_shape[-1] == 1 and len(input_shape) > 1:
         input_shape = tuple(input_shape[:-1])
@@ -69,9 +69,8 @@ def to_categorical(y, num_classes=None):
     if not num_classes:
         num_classes = np.max(y) + 1
     n = y.shape[0]
-    categorical = np.zeros((n, num_classes), dtype=np.float32)
+    categorical = np.zeros((n, num_classes), dtype=np.int32)
     categorical[np.arange(n), y] = 1
     output_shape = input_shape + (num_classes,)
     categorical = np.reshape(categorical, output_shape)
     return categorical
-

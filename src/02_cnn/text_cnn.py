@@ -25,10 +25,12 @@ class TextCNN:
 
         # Embedding layer
         with tf.name_scope("embedding"):
-            W_embedding = tf.get_variable(name="embedding_lookup_table",
-                                          shape=embedding_lookup_table.shape,
-                                          initializer=tf.constant_initializer(embedding_lookup_table),
-                                          trainable=True)
+            # W_embedding = tf.get_variable(name="W_embedding",
+            #                               shape=embedding_lookup_table.shape,
+            #                               initializer=tf.constant_initializer(embedding_lookup_table),
+            #                               trainable=True)
+            W_embedding = tf.Variable(tf.constant(embedding_lookup_table, shape=embedding_lookup_table.shape),
+                                      trainable=True, name="W_embedding")
             self.embedding_words = tf.nn.embedding_lookup(W_embedding, self.input_X)
             self.embedding_words_expanded = tf.expand_dims(self.embedding_words, axis=-1)
 
@@ -38,12 +40,8 @@ class TextCNN:
             with tf.name_scope("conv-maxpool-%s" % filter_size):
                 # Convolution layer
                 filter_shape = [filter_size, W_embedding.shape[1], 1, num_filters]
-                W_filter = tf.get_variable(name="W_filter",
-                                           shape=filter_shape,
-                                           initializer=tf.truncated_normal_initializer(stddev=0.1))
-                b_filter = tf.get_variable(name="b_filter",
-                                           shape=[num_filters],
-                                           initializer=tf.constant_initializer(0.1))
+                W_filter = tf.Variable(tf.truncated_normal(filter_shape, stddev=0.1), name="W_filter")
+                b_filter = tf.Variable(tf.constant(0.1, shape=[num_filters]), name="b_filter")
                 conv = tf.nn.conv2d(input=self.embedding_words_expanded,
                                     filter=W_filter,
                                     strides=[1, 1, 1, 1],
@@ -76,12 +74,8 @@ class TextCNN:
         # Final (unnormalized) scores and predictions
         l2_loss = tf.constant(0.0)
         with tf.name_scope("output"):
-            W_out = tf.get_variable(name="W_out",
-                                    shape=[num_filters_total, num_classes],
-                                    initializer=tf.truncated_normal_initializer(stddev=0.1))
-            b_out = tf.get_variable(name="b_out",
-                                    shape=[num_classes],
-                                    initializer=tf.constant_initializer(0.1))
+            W_out = tf.Variable(tf.truncated_normal([num_filters_total, num_classes], stddev=0.1), name="W_out")
+            b_out = tf.Variable(tf.constant(0.1, shape=[num_classes]), name="b_out")
             l2_loss += tf.nn.l2_loss(W_out)
             l2_loss += tf.nn.l2_loss(b_out)
             self.scores = tf.nn.xw_plus_b(self.h_drop, W_out, b_out, name="scores")

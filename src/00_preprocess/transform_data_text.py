@@ -41,7 +41,7 @@ def preprocess(data, sequence_length=3000):
     res = []
     for sample in data:
         if len(sample) > sequence_length:
-            sample = sample[:sequence_length - 1]
+            sample = sample[:sequence_length]
             res.append(sample)
         else:
             str_added = [PAD_STR] * (sequence_length - len(sample))
