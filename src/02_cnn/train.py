@@ -19,6 +19,8 @@ from datetime import datetime
 from util import *
 from text_cnn import TextCNN
 
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+
 # =============================================================================================
 # Parameters
 
@@ -189,23 +191,11 @@ def main(argv=None):
     X_train, y_train, X_val, y_val, embedding_lookup_table = load_data_and_embedding()
     print("Load finished!\n")
 
-    print(X_train.shape)
-    print(type(X_train))
-    print(y_train.shape)
-    print(type(y_train))
-
-    print()
-
-    print(X_val.shape)
-    print(type(X_val))
-    print(y_val.shape)
-    print(type(y_val))
-
-    # print("Start training...")
-    # t0 = time()
-    # train(X_train, y_train, X_val, y_val, embedding_lookup_table)
-    # print("Done in %.3f seconds." % (time() - t0))
-    # print("Training finished! ( ^ _ ^ ) V")
+    print("Start training...")
+    t0 = time()
+    train(X_train, y_train, X_val, y_val, embedding_lookup_table)
+    print("Done in %.3f seconds." % (time() - t0))
+    print("Training finished! ( ^ _ ^ ) V")
 
 
 if __name__ == '__main__':

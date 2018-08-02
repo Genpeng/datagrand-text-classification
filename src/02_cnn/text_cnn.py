@@ -10,6 +10,35 @@ Date:   2018/07/30
 import tensorflow as tf
 
 
+def weight_variable(shape, name):
+    """Generates a weight variable of a given shape.
+
+    Args:
+        shape: the shape of the `Variable`
+        name: the name of the `Variable`
+
+    Returns:
+        A `Variable` of the specified shape filled with
+        random truncated normal values.
+    """
+    initial_value = tf.truncated_normal(shape, stddev=0.1)
+    return tf.Variable(initial_value, name=name)
+
+
+def bias_variable(shape, name):
+    """Generates a bias variable of a given shape.
+
+    Args:
+        shape: the shape of the `Variable`
+        name: the name of the `Variable`
+
+    Returns:
+        A `Variable` of the specified shape filled with constant 0.1.
+    """
+    initial_value = tf.constant(0.1, shape=shape)
+    return tf.Variable(initial_value, name=name)
+
+
 class TextCNN:
     """A CNN model for text classification.
 
@@ -38,8 +67,8 @@ class TextCNN:
             with tf.name_scope("conv-maxpool-%s" % filter_size):
                 # Convolution layer
                 filter_shape = [filter_size, embedding_lookup_table.shape[1], 1, num_filters]
-                W_filter = tf.Variable(tf.truncated_normal(filter_shape, stddev=0.1), name="W_filter")
-                b_filter = tf.Variable(tf.constant(0.1, shape=[num_filters]), name="b_filter")
+                W_filter = weight_variable(filter_shape, "W_filter")
+                b_filter = bias_variable([num_filters], "b_filter")
                 conv = tf.nn.conv2d(input=self.embedding_words_expanded,
                                     filter=W_filter,
                                     strides=[1, 1, 1, 1],
@@ -72,8 +101,8 @@ class TextCNN:
         # Final (unnormalized) scores and predictions
         l2_loss = tf.constant(0.0)
         with tf.name_scope("output"):
-            W_out = tf.Variable(tf.truncated_normal([num_filters_total, num_classes], stddev=0.1), name="W_out")
-            b_out = tf.Variable(tf.constant(0.1, shape=[num_classes]), name="b_out")
+            W_out = weight_variable([num_filters_total, num_classes], "W_out")
+            b_out = bias_variable([num_classes], "b_out")
             l2_loss += tf.nn.l2_loss(W_out)
             l2_loss += tf.nn.l2_loss(b_out)
             self.scores = tf.nn.xw_plus_b(self.h_drop, W_out, b_out, name="scores")
