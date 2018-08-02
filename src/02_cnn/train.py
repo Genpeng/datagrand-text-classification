@@ -19,8 +19,6 @@ from datetime import datetime
 from util import *
 from text_cnn import TextCNN
 
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-
 # =============================================================================================
 # Parameters
 
@@ -37,7 +35,7 @@ tf.flags.DEFINE_float("l2_reg_lambda", 0.0, "L2 regularization lambda (default: 
 
 # Training parameters
 tf.flags.DEFINE_float("learning_rate", 0.001, "Learning rate (default: 0.001)")
-tf.flags.DEFINE_integer("batch_size", 128, "Batch size (default: 128)")
+tf.flags.DEFINE_integer("batch_size", 64, "Batch size (default: 128)")
 tf.flags.DEFINE_integer("num_epochs", 20, "Number of training epochs (default: 200)")
 tf.flags.DEFINE_integer("evaluate_every", 100, "Evaluate the model on the validation set after this many steps (default: 100)")
 tf.flags.DEFINE_integer("checkpoint_every", 1000, "Save model after this many steps (default: 1000)")
@@ -191,11 +189,23 @@ def main(argv=None):
     X_train, y_train, X_val, y_val, embedding_lookup_table = load_data_and_embedding()
     print("Load finished!\n")
 
-    print("Start training...")
-    t0 = time()
-    train(X_train, y_train, X_val, y_val, embedding_lookup_table)
-    print("Done in %.3f seconds." % (time() - t0))
-    print("Training finished! ( ^ _ ^ ) V")
+    print(X_train.shape)
+    print(type(X_train))
+    print(y_train.shape)
+    print(type(y_train))
+
+    print()
+
+    print(X_val.shape)
+    print(type(X_val))
+    print(y_val.shape)
+    print(type(y_val))
+
+    # print("Start training...")
+    # t0 = time()
+    # train(X_train, y_train, X_val, y_val, embedding_lookup_table)
+    # print("Done in %.3f seconds." % (time() - t0))
+    # print("Training finished! ( ^ _ ^ ) V")
 
 
 if __name__ == '__main__':

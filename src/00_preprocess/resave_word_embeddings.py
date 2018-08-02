@@ -19,7 +19,7 @@ SPECIAL_SYMBOLS = ['<PAD>', '<UNK>']
 
 print("Load words and its corresponding embeddings...")
 np.random.seed(42)
-word_embedding_file = "../../word_vectors/gemsim-word-300d-mc5.txt"
+word_embedding_file = "../../word_vectors/gensim-word-300d-mc5.txt"
 with open(word_embedding_file, 'r', encoding='utf-8') as f:
     lines = f.read().splitlines()[1:]
 
