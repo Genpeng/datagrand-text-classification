@@ -76,8 +76,8 @@ with open(word2id_file, 'rb') as fin:
 # ======================================================================================
 
 print("Load data...")
-train_data_file = "../../raw_data/train_set.csv"
-test_data_file = "../../raw_data/test_set.csv"
+train_data_file = "../../raw_data/train_demo.csv"
+test_data_file = "../../raw_data/test_demo.csv"
 words_train, labels_train = load_word_samples_and_labels(train_data_file, header=True, train=True)
 words_test, _ = load_word_samples_and_labels(test_data_file, header=True, train=False)
 

@@ -25,12 +25,10 @@ class TextCNN:
 
         # Embedding layer
         with tf.name_scope("embedding"):
-            # W_embedding = tf.get_variable(name="W_embedding",
-            #                               shape=embedding_lookup_table.shape,
-            #                               initializer=tf.constant_initializer(embedding_lookup_table),
-            #                               trainable=True)
-            W_embedding = tf.Variable(tf.constant(embedding_lookup_table, shape=embedding_lookup_table.shape),
-                                      trainable=True, name="W_embedding")
+            W_embedding = tf.get_variable(name="W_embedding",
+                                          shape=embedding_lookup_table.shape,
+                                          initializer=tf.constant_initializer(embedding_lookup_table),
+                                          trainable=True)
             self.embedding_words = tf.nn.embedding_lookup(W_embedding, self.input_X)
             self.embedding_words_expanded = tf.expand_dims(self.embedding_words, axis=-1)
 
@@ -39,7 +37,7 @@ class TextCNN:
         for filter_size in filter_sizes:
             with tf.name_scope("conv-maxpool-%s" % filter_size):
                 # Convolution layer
-                filter_shape = [filter_size, W_embedding.shape[1], 1, num_filters]
+                filter_shape = [filter_size, embedding_lookup_table.shape[1], 1, num_filters]
                 W_filter = tf.Variable(tf.truncated_normal(filter_shape, stddev=0.1), name="W_filter")
                 b_filter = tf.Variable(tf.constant(0.1, shape=[num_filters]), name="b_filter")
                 conv = tf.nn.conv2d(input=self.embedding_words_expanded,

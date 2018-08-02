@@ -83,7 +83,6 @@ def load_data_and_embedding():
 
     # Load embedding lookup table
     embedding_lookup_table = np.load(FLAGS.embedding_file)
-
     return X_train, y_train, X_val, y_val, embedding_lookup_table
 
 
