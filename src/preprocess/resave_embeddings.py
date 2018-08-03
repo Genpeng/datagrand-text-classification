@@ -8,6 +8,7 @@ Author: StrongXGP (xgp1227@gmail.com)
 Date:   2018/07/29
 """
 
+import gc
 import pickle
 import numpy as np
 
@@ -44,12 +45,12 @@ def load_embedding(embedding_file):
 
 
 def main():
-    print("[INFO] Load character embeddings")
+    print("[INFO] Load character embeddings...")
     char_embedding_file = "../../embeddings/datagrand-char-300d.txt"
     id_to_char_map, char_to_id_map, char_embeddings = load_embedding(char_embedding_file)
     print("[INFO] Finished!")
 
-    print("[INFO] Save character embeddings")
+    print("[INFO] Save character embeddings...")
     id_to_char_file = "../../embeddings/id2char.pkl"
     char_to_id_file = "../../embeddings/char2id.pkl"
     char_embedding_resave_file = "../../embeddings/char-embedding-300d.npy"
@@ -60,22 +61,25 @@ def main():
     np.save(char_embedding_resave_file, char_embeddings)
     print("[INFO] Finish!")
 
+    del id_to_char_map, char_to_id_map, char_embeddings
+    gc.collect()
+
+    print("[INFO] Load word embeddings...")
     word_embedding_file = "../../embeddings/datagrand-word-300d-mc5.txt"
     id_to_word_map, word_to_id_map, word_embeddings = load_embedding(word_embedding_file)
+    print("[INFO] Finished!")
 
-    word_embedding_file = "../../embeddings/datagrand-word-300d-mc5.txt"
+    print("[INFO] Save word embeddings...")
+    id_to_word_file = "../../embeddings/id2word.pkl"
+    word_to_id_file = "../../embeddings/word2id.pkl"
+    word_embedding_resave_file = "../../embeddings/word-embedding-300d-mc5.npy"
+    with open(id_to_word_file, 'wb') as fout:
+        pickle.dump(id_to_word_map, fout)
+    with open(word_to_id_file, 'wb') as fout:
+        pickle.dump(word_to_id_map, fout)
+    np.save(word_embedding_resave_file, word_embeddings)
+    print("[INFO] Finished!")
 
 
-# Save to file
-# ===========================================================================================
-
-print("Save to file...")
-id2word_file = "../../processed_data/id2word.pkl"
-word2id_file = "../../processed_data/word2id.pkl"
-word_embeddings_file = "../../word_vectors/word-embedding-300d-mc5.npy"
-with open(id2word_file, 'wb') as fout:
-    pickle.dump(id_to_word_map, fout)
-with open(word2id_file, 'wb') as fout:
-    pickle.dump(word_to_id_map, fout)
-np.save(word_embeddings_file, word_embeddings)
-print("Finished! ( ^ _ ^ ) V")
+if __name__ == '__main__':
+    main()
