@@ -43,7 +43,8 @@ raw_data/
 runs/
 reference_code/
 .ipynb_checkpoints/
-word_vectors/
+embeddings/
+embeddings2/
 submissions/
 models/
 word_vectors/
