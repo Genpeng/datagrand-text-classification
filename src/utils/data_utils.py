@@ -7,11 +7,22 @@ Author: StrongXGP (xgp1227@gmail.com)
 Date:   2018/07/30
 """
 
+import pickle
 import numpy as np
 
+# Global variable
+PAD_STR = '<PAD>'
 
-def load_word_samples_and_labels(data_path, header=True, train=True):
-    """Load words and labels of each sample (document)."""
+
+def load_mapping_table(mapping_table_file):
+    """Load the mapping table from words (characters) to its corresponding ids."""
+    with open(mapping_table_file, 'rb') as fin:
+        mapping_table = pickle.load(fin)
+    return mapping_table
+
+
+def load_samples_and_labels(data_path, header=True, col=1, train=True):
+    """Load words (or characters) and its label of all the samples."""
     if header:
         start_index = 1
     else:
@@ -19,15 +30,15 @@ def load_word_samples_and_labels(data_path, header=True, train=True):
 
     with open(data_path, 'r', encoding='utf-8') as f:
         lines = f.read().splitlines()[start_index:]
-        word_samples = [line.split(',')[2] for line in lines]
-        word_samples = [word_sample.split() for word_sample in word_samples]
+        samples = [line.split(',')[col] for line in lines]
+        samples = [sample.split() for sample in samples]
 
     if train:
         labels = [int(line.split(',')[3]) for line in lines]
     else:
         labels = []
 
-    return word_samples, labels
+    return samples, labels
 
 
 def batch_iter(data, batch_size, num_epochs, shuffle=True):
@@ -72,3 +83,32 @@ def to_categorical(y, num_classes=None):
     output_shape = input_shape + (num_classes,)
     categorical = np.reshape(categorical, output_shape)
     return categorical
+
+
+def truncate(data, sequence_length=3000):
+    """Truncate the words (characters) of each sample to a fixed length."""
+    res = []
+    for sample in data:
+        if len(sample) > sequence_length:
+            sample = sample[:sequence_length]
+            res.append(sample)
+        else:
+            str_added = [PAD_STR] * (sequence_length - len(sample))
+            sample += str_added
+            res.append(sample)
+    return res
+
+
+def transform_to_ids(data, word_to_id_map):
+    """Transform the words (characters) of a sample to its ids."""
+    res = list()
+    for words in data:
+        ids = list()
+        for word in words:
+            ids.append(word_to_id_map.get(word, 1))  # 1 is the id of '<UNK>'
+            # if word in word_to_id_map:
+            #     ids.append(word_to_id_map[word])
+            # else:
+            #     ids.append(1)  # 1 is the id of '<UNK>'
+        res.append(ids)
+    return res
