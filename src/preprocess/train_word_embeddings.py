@@ -61,7 +61,7 @@ def main():
     # =========================================================================
 
     # Initialize word2vec model
-    model = Word2Vec(size=300, min_count=5, sg=0, iter=1, workers=16, seed=42)
+    model = Word2Vec(size=300, min_count=5, sg=0, iter=30, workers=16, seed=42)
     model.build_vocab(sentences)
     print("[INFO] ", end='')
     print(model)
