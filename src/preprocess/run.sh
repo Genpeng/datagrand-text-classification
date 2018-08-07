@@ -12,3 +12,6 @@ python resave_word_embeddings.py
 
 # 4. Transform the words (or characters) of all the samples to its ids
 python transform_data_text.py
+
+# 5. Split training training set and validation set into small batches
+python create_batch_data.py

@@ -7,6 +7,7 @@ Author: StrongXGP (xgp1227@gmail.com)
 Date:   2018/07/30
 """
 
+import os
 import pickle
 import numpy as np
 import pandas as pd
@@ -112,8 +113,8 @@ def transform_characters():
     ids_test = pd.DataFrame(ids_test, dtype=np.int32)
 
     print("[INFO] Save to file...")
-    ids_train.to_csv("../../processed_data/train_ids_and_labels.txt", index=False)
-    ids_test.to_csv("../../processed_data/test_ids.txt", index=False)
+    ids_train.to_csv("../../processed_data/char/train_ids_and_labels.txt", index=False)
+    ids_test.to_csv("../../processed_data/char/test_ids.txt", index=False)
     print("[INFO] Finished! ( ^ _ ^ ) V")
 
 
@@ -157,8 +158,8 @@ def transform_words():
     ids_test = pd.DataFrame(ids_test, dtype=np.int32)
 
     print("[INFO] Save to file...")
-    ids_train.to_csv("../../processed_data/train_ids_and_labels.txt", index=False)
-    ids_test.to_csv("../../processed_data/test_ids.txt", index=False)
+    ids_train.to_csv("../../processed_data/word/train_ids_and_labels.txt", index=False)
+    ids_test.to_csv("../../processed_data/word/test_ids.txt", index=False)
     print("[INFO] Finished! ( ^ _ ^ ) V")
 
 
