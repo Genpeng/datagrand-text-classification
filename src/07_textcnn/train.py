@@ -10,7 +10,7 @@ from tensorflow.contrib import learn
 
 # Self-defined modules or classes
 import data_helper
-from text_cnn import TextCNN
+from cnn import TextCNN
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 

@@ -17,7 +17,7 @@ from datetime import datetime
 
 # Import self-defined modules and classes
 from util import *
-from text_cnn import TextCNN
+from cnn import TextCNN
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
