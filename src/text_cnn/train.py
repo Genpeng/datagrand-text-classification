@@ -7,11 +7,8 @@ Author: StrongXGP (xgp1227#163.com)
 Date:   2018/07/31
 """
 
-import gc
 import os
-import pickle
 import numpy as np
-import pandas as pd
 import tensorflow as tf
 from time import time
 from datetime import datetime
