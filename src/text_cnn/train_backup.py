@@ -17,7 +17,7 @@ from datetime import datetime
 
 # Import self-defined modules and classes
 from util import *
-from cnn import TextCNN
+from text_cnn import TextCNN
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
@@ -26,8 +26,8 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 # Data loading parameters
 tf.flags.DEFINE_float("val_sample_percentage", 0.1, "Percentage of the training data to use for validation")
-tf.flags.DEFINE_string("train_data_file", "../../processed_data/train_ids_and_labels.txt", "File of training data set")
-tf.flags.DEFINE_string("embedding_file", "../../word_vectors/word-embedding-300d-mc5.npy", "File of embedding lookup table")
+tf.flags.DEFINE_string("train_data_file", "../../processed_data/word/train_ids_and_labels.txt", "File of training data set")
+tf.flags.DEFINE_string("embedding_file", "../../embeddings/word-embedding-300d-mc5.npy", "File of embedding lookup table")
 
 # Model hyper-parameters
 tf.flags.DEFINE_string("filter_sizes", "2,3,4", "Comma-separated filter sizes (default: 2,3,4)")
@@ -37,11 +37,11 @@ tf.flags.DEFINE_float("l2_reg_lambda", 0.0, "L2 regularization lambda (default: 
 
 # Training parameters
 tf.flags.DEFINE_float("learning_rate", 0.001, "Learning rate (default: 0.001)")
-tf.flags.DEFINE_integer("batch_size", 64, "Batch size (default: 128)")
+tf.flags.DEFINE_integer("batch_size", 128, "Batch size (default: 128)")
 tf.flags.DEFINE_integer("num_epochs", 20, "Number of training epochs (default: 200)")
 tf.flags.DEFINE_integer("evaluate_every", 100, "Evaluate the model on the validation set after this many steps (default: 100)")
 tf.flags.DEFINE_integer("checkpoint_every", 1000, "Save model after this many steps (default: 1000)")
-tf.flags.DEFINE_integer("num_checkpoints", 3, "Number of checkpoints to store (default: 3)")
+tf.flags.DEFINE_integer("num_checkpoints", 2, "Number of checkpoints to store (default: 2)")
 # tf.flags.DEFINE_integer("update_embed_every", 1, "Start update embedding loopup table after this many epochs (default: 1)")
 # tf.flags.DEFINE_float("decay_rate", 0.8, "Decay rate of the learning rate (default: 0.8)")
 # tf.flags.DEFINE_integer("decay_every", 15000, "Decay the learning rate after this many steps (default: 15000)")
@@ -117,14 +117,14 @@ def train(X_train, y_train, X_val, y_val, embedding_lookup_table):
                     grad_summaries.append(sparsity_summary)
             grad_summaries_merged = tf.summary.merge(grad_summaries)
 
+            # Summaries for loss and accuracy
+            loss_summary = tf.summary.scalar(name="loss", tensor=cnn.loss)
+            acc_summary = tf.summary.scalar(name="accuracy", tensor=cnn.accuracy)
+
             # Output directories for models and summaries
             timestamp = str(int(time()))
             out_dir = os.path.abspath(os.path.join(os.path.curdir, "runs", timestamp))
             print("Write to {}\n".format(out_dir))
-
-            # Summaries for loss and accuracy
-            loss_summary = tf.summary.scalar(name="loss", tensor=cnn.loss)
-            acc_summary = tf.summary.scalar(name="accuracy", tensor=cnn.accuracy)
 
             # Train summaries
             train_summary_op = tf.summary.merge([loss_summary, acc_summary, grad_summaries_merged])
@@ -155,6 +155,7 @@ def train(X_train, y_train, X_val, y_val, embedding_lookup_table):
                     [train_op, global_step, train_summary_op, cnn.loss, cnn.accuracy], feed_dict=feed_dict)
                 time_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 print("{} - step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
+                # print("{} - step {:>6d}, loss {:8.5f}, acc {:.2%}".format(time_str, step, loss, accuracy))
                 train_summary_writer.add_summary(summaries, global_step=step)
 
             def val_step(X_batch, y_batch, writer=None):
@@ -166,6 +167,7 @@ def train(X_train, y_train, X_val, y_val, embedding_lookup_table):
                                                            feed_dict=feed_dict)
                 time_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 print("{} - step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
+                # print("{} - step {:>6d}, loss {:8.5f}, acc {:.2%}".format(time_str, step, loss, accuracy))
                 if writer:
                     writer.add_summary(summaries, global_step=step)
 

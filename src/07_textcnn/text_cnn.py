@@ -5,7 +5,7 @@ TensorFlow implementation of CNN model in the paper
 "Convolutional neural networks for sentence classification".
 
 Reference:
-- http://www.wildml.com/2015/12/implementing-a-cnn-for-text-classification-in-tensorflow/
+- http://www.wildml.com/2015/12/implementing-a-text_cnn-for-text-classification-in-tensorflow/
 - Kim, Yoon. "Convolutional neural networks for sentence classification." arXiv preprint arXiv:1408.5882 (2014).
 
 Author: StrongXGP <xgp1227@gmail.com>
