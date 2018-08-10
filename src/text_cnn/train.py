@@ -33,8 +33,7 @@ NUM_CLASSES = 19
 # tf.flags.DEFINE_float("val_sample_percentage", 0.1, "Percentage of the training data to use for validation")
 tf.flags.DEFINE_string("train_data_dir", "../../processed_data/word/train/", "Directory of training set")
 tf.flags.DEFINE_string("val_data_dir", "../../processed_data/word/val/", "Directory of validation set")
-tf.flags.DEFINE_string("embedding_path", "../../embeddings/word-embedding-300d-mc5.npy",
-                       "Path of embedding lookup table")
+tf.flags.DEFINE_string("embedding_path", "../../embeddings/word-embedding-300d-mc5.npy", "Path of embedding lookup table")
 
 # Model hyper-parameters
 tf.flags.DEFINE_string("filter_sizes", "2,3,4", "Comma-separated filter sizes (default: 2,3,4)")
