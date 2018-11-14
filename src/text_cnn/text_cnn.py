@@ -48,9 +48,9 @@ class TextCNN:
     def __init__(self, sequence_length, num_classes, embedding_lookup_table,
                  filter_sizes, num_filters, l2_reg_lambda=0.0):
         # Placeholders for input, output and dropout
-        self._X = tf.placeholder(tf.int32, shape=[None, sequence_length], name="X")
-        self._Y = tf.placeholder(tf.int32, shape=[None, num_classes], name="Y")
-        self._dropout_keep_prob = tf.placeholder(tf.float32, name="dropout_keep_prob")
+        self.X = tf.placeholder(tf.int32, shape=[None, sequence_length], name="X")
+        self.Y = tf.placeholder(tf.int32, shape=[None, num_classes], name="Y")
+        self.dropout_keep_prob = tf.placeholder(tf.float32, name="dropout_keep_prob")
 
         # Embedding layer
         with tf.name_scope("embedding"):
@@ -58,7 +58,7 @@ class TextCNN:
                                           shape=embedding_lookup_table.shape,
                                           initializer=tf.constant_initializer(embedding_lookup_table),
                                           trainable=True)
-            self.embedding_words = tf.nn.embedding_lookup(W_embedding, self._X)
+            self.embedding_words = tf.nn.embedding_lookup(W_embedding, self.X)
             self.embedding_words_expanded = tf.expand_dims(self.embedding_words, axis=-1)
 
         # Create a convolution layer followed by a max pooling layer for each filter size
@@ -105,31 +105,16 @@ class TextCNN:
             b_out = bias_variable([num_classes], "b_out")
             l2_loss += tf.nn.l2_loss(W_out)
             l2_loss += tf.nn.l2_loss(b_out)
-            self.scores = tf.nn.xw_plus_b(self.h_drop, W_out, b_out, name="scores")
-            self.predictions = tf.argmax(self.scores, axis=1, name="predictions")
+            self.logits = tf.nn.xw_plus_b(self.h_drop, W_out, b_out, name="logits")
+            self.preds = tf.argmax(self.logits, axis=1, name="preds")
 
         # Calculate mean cross-entropy loss
         with tf.name_scope("loss"):
-            losses = tf.nn.softmax_cross_entropy_with_logits_v2(logits=self.scores, labels=self._Y)
-            self.loss = tf.reduce_mean(losses) + l2_reg_lambda * l2_loss
+            losses = tf.nn.softmax_cross_entropy_with_logits_v2(logits=self.logits, labels=self.Y)
+            self.penalty = tf.multiply(l2_reg_lambda, l2_loss, name="penalty")
+            self.loss = tf.add(tf.reduce_mean(losses), self.penalty, name="loss")
 
         # Accuracy
         with tf.name_scope("accuracy"):
-            correct_predictions = tf.equal(self.predictions, tf.argmax(self._Y, axis=1))
+            correct_predictions = tf.equal(self.preds, tf.argmax(self.Y, axis=1))
             self.accuracy = tf.reduce_mean(tf.cast(correct_predictions, dtype=tf.float32), name="accuracy")
-
-    @property
-    def X(self):
-        return self._X
-
-    @property
-    def Y(self):
-        return self._Y
-
-    @property
-    def dropout_keep_prob(self):
-        return self._dropout_keep_prob
-
-    @dropout_keep_prob.setter
-    def dropout_keep_prob(self, dropout_keep_prob):
-        self._dropout_keep_prob = dropout_keep_prob

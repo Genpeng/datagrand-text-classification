@@ -18,3 +18,10 @@
 - TextCNN已经能够运行，但是进行验证集预测时，报了
   【tensorflow.python.framework.errors_impl.ResourceExhaustedError】异常，还是需要模仿
   别人的程序，对自己的程序进行修改（果然数据量大了之后就会有很多的问题）
+
+2018年8月10日 星期五 天气阴
+- 终于把TextCNN跑起来了，但是还是需要修改很多地方：
+  *1. 对模型的结构（增加一个全连接层）进行调整；
+  2. 使用batch normalization；
+  3. 增加F1 score评价指标；
+  4. Embedding layer的参数前期不可变，后期才可变；

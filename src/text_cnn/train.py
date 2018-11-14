@@ -7,11 +7,14 @@ Author: StrongXGP (xgp1227#163.com)
 Date:   2018/07/31
 """
 
+# TODO: 1. batch normalization 2. embedding update (√) 3. add another fully-connected layer
+
 import os
 import numpy as np
 import tensorflow as tf
 from time import time
 from datetime import datetime
+from sklearn.metrics import accuracy_score, f1_score
 
 # Import self-defined modules and classes
 from util import *
@@ -45,9 +48,10 @@ tf.flags.DEFINE_integer("num_epochs", 20, "Number of training epochs (default: 2
 tf.flags.DEFINE_integer("evaluate_every", 100, "Evaluate the model on the validation set after this many steps (default: 100)")
 tf.flags.DEFINE_integer("checkpoint_every", 1000, "Save model after this many steps (default: 1000)")
 tf.flags.DEFINE_integer("num_checkpoints", 2, "Number of checkpoints to store (default: 2)")
-# tf.flags.DEFINE_integer("update_embed_every", 1, "Start update embedding loopup table after this many epochs (default: 1)")
-# tf.flags.DEFINE_float("decay_rate", 0.8, "Decay rate of the learning rate (default: 0.8)")
-# tf.flags.DEFINE_integer("decay_every", 15000, "Decay the learning rate after this many steps (default: 15000)")
+tf.flags.DEFINE_integer("update_embedding_every", 1, "Start update embedding loopup table after this many epochs (default: 1)")
+tf.flags.DEFINE_integer("decay_every", 10000, "Decay the learning rate after this many steps (default: 10000)")
+tf.flags.DEFINE_float("decay_rate", 0.8, "Decay rate of the learning rate (default: 0.8)")
+tf.flags.DEFINE_float("max_f1_score", 0.77, "The maximum of f1 score in the validation set (default: 0.77)")
 
 # Misc parameters
 tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")
@@ -102,9 +106,29 @@ def main(argv=None):
 
             # Define training procedure
             global_step = tf.Variable(0, trainable=False, name="global_step")
-            optimizer = tf.train.AdamOptimizer(learning_rate=FLAGS.learning_rate)
-            grads_and_vars = optimizer.compute_gradients(cnn.loss)
-            train_op = optimizer.apply_gradients(grads_and_vars, global_step=global_step)
+            # optimizer = tf.train.AdamOptimizer(learning_rate=FLAGS.learning_rate)
+            # grads_and_vars = optimizer.compute_gradients(cnn.loss)
+            # train_op = optimizer.apply_gradients(grads_and_vars, global_step=global_step)
+            with tf.variable_scope("train_ops") as vs:
+                learning_rate = tf.train.exponential_decay(learning_rate=FLAGS.learning_rate,
+                                                           global_step=global_step,
+                                                           decay_steps=FLAGS.decay_every,
+                                                           decay_rate=FLAGS.decay_rate,
+                                                           staircase=False)
+
+                with tf.variable_scope("optimizer1"):  # optimizer1
+                    tvars1 = tf.trainable_variables()
+                    grads1 = tf.gradients(cnn.loss, tvars1)
+                    optimizer1 = tf.train.AdamOptimizer(learning_rate=learning_rate)
+                    train_op1 = optimizer1.apply_gradients(zip(grads1, tvars1), global_step=global_step)
+
+                with tf.variable_scope("optimizer2"):  # optimizer2 without updating embedding lookup table
+                    tvars2 = [tvar for tvar in tvars1 if "W_embedding" not in tvar.name]
+                    grads2 = tf.gradients(cnn.loss, tvars2)
+                    optimizer2 = tf.train.AdamOptimizer(learning_rate=learning_rate)
+                    train_op2 = optimizer2.apply_gradients(zip(grads2, tvars2), global_step=global_step)
+
+                vars_train_ops = [var for var in tf.global_variables() if var.name.startswith(vs.name + '/')]
 
             print("[INFO] Assemble finished!")
 
@@ -166,7 +190,7 @@ def main(argv=None):
                 feed_dict = {cnn.X: X_batch, cnn.Y: y_batch, cnn.dropout_keep_prob: FLAGS.dropout_keep_prob}
                 _, step, summaries, loss, accuracy = sess.run(fetches=fetches, feed_dict=feed_dict)
                 time_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                print("{} - step {:>6d}, loss {:8.5f}, acc {:4.2%}".format(time_str, step, loss, accuracy))
+                print("{} - step {:>6d}, loss {:8.5f}, acc {:.2%}".format(time_str, step, loss, accuracy))
                 train_summary_writer.add_summary(summaries, global_step=step)
 
             def val_step(X_batch, y_batch, writer=None):
@@ -175,7 +199,7 @@ def main(argv=None):
                 feed_dict = {cnn.X: X_batch, cnn.Y: y_batch, cnn.dropout_keep_prob: 1.0}
                 step, summaries, loss, accuracy = sess.run(fetches=fetches, feed_dict=feed_dict)
                 time_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                print("{} - step {:>6d}, loss {:8.5f}, acc {:4.2%}".format(time_str, step, loss, accuracy))
+                print("{} - step {:>6d}, loss {:8.5f}, acc {:.2%}".format(time_str, step, loss, accuracy))
                 if writer:
                     writer.add_summary(summaries, global_step=step)
 
